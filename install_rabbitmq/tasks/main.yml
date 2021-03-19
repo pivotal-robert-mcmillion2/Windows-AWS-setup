@@ -1,0 +1,56 @@
+---
+- name: Install RabbitMQ
+  win_chocolatey:
+    name: rabbitmq
+    version: "{{ version }}"
+    state: present
+
+- name: Enable firewall for Public and Private profiles
+  community.windows.win_firewall:
+    state: disabled
+    profiles:
+    - Private
+    - Public
+
+- name: Capturing Erlang Cookie On Master
+  ansible.windows.win_shell: "type {{ rabbitmq_erlang_cookie_file }}"
+  register: "rabbitmq_erlang_cookie"
+  when: inventory_hostname == "win-rabbit-node1"
+
+- name: Setting Erlang Cookie Of Master on Non-Master
+  set_fact:
+    rabbitmq_erlang_cookie: "{{ hostvars['win-rabbit-node1']['rabbitmq_erlang_cookie']['stdout'] }}"
+
+- name: Create a Unix-style file from a Jinja2 template
+  ansible.windows.win_template:
+    src: erlang.cookie.j2
+    dest: C:\Users\Administrator\.erlang.cookie
+    newline_sequence: '\n'
+    backup: yes
+  
+- name: Create a Unix-style file from a Jinja2 template
+  ansible.windows.win_template:
+    src: erlang.cookie.j2
+    dest: "{{ rabbitmq_erlang_cookie_file }}"
+    newline_sequence: '\n'
+    backup: yes
+
+- name: enable rabbitmq plugins
+  community.windows.win_rabbitmq_plugin:
+    names: rabbitmq_prometheus,rabbitmq_management,rabbitmq_federation,rabbitmq_federation_management,rabbitmq_stomp,rabbitmq_shovel,rabbitmq_shovel_management,rabbitmq_mqtt,rabbitmq_tracing
+    state: enabled
+  notify:
+  - restart rabbitmq
+
+- name: Run commands to add admin user
+  ansible.windows.win_shell: C:/"Program Files"/"RabbitMQ Server"/rabbitmq_server-"{{ version }}"/sbin/rabbitmqctl.bat add_user admin changeme
+  when: inventory_hostname == "win-rabbit-node1"
+
+- name: Run commands to set tags on admin user
+  ansible.windows.win_shell: C:/"Program Files"/"RabbitMQ Server"/rabbitmq_server-"{{ version }}"/sbin/rabbitmqctl.bat set_user_tags admin administrator
+  when: inventory_hostname == "win-rabbit-node1"
+
+- name: Run commands to set permissions on admin user
+  ansible.windows.win_shell: C:/"Program Files"/"RabbitMQ Server"/rabbitmq_server-"{{ version }}"/sbin/rabbitmqctl.bat set_permissions -p '/' admin '.*' '.*' '.*'
+  when: inventory_hostname == "win-rabbit-node1"
+

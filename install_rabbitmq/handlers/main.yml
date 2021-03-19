@@ -1,0 +1,7 @@
+---
+# Handler for rabbitmq notifications
+
+- name: restart rabbitmq
+  ansible.windows.win_service:
+    name: RabbitMQ
+    state: restarted

@@ -1,0 +1,22 @@
+---
+- name: stopping rabbitmq app
+  ansible.windows.win_shell: C:/"Program Files"/"RabbitMQ Server"/rabbitmq_server-"{{ version }}"/sbin/rabbitmqctl.bat stop_app
+
+
+- name: resetting rabbitmq
+  ansible.windows.win_shell: C:/"Program Files"/"RabbitMQ Server"/rabbitmq_server-"{{ version }}"/sbin/rabbitmqctl.bat reset
+
+
+- name: joining rabbitmq node to cluster
+  ansible.windows.win_shell: C:/"Program Files"/"RabbitMQ Server"/rabbitmq_server-"{{ version }}"/sbin/rabbitmqctl.bat join_cluster rabbit@win-rabbit-node1
+  
+
+- name: starting rabbitmq app
+  ansible.windows.win_shell: C:/"Program Files"/"RabbitMQ Server"/rabbitmq_server-"{{ version }}"/sbin/rabbitmqctl.bat start_app
+  
+
+- name: getting cluster_status
+  ansible.windows.win_shell: C:/"Program Files"/"RabbitMQ Server"/rabbitmq_server-"{{ version }}"/sbin/rabbitmqctl.bat cluster_status
+  register: cluster_status
+
+- debug: var=cluster_status.stdout_lines

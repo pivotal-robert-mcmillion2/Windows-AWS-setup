@@ -1,0 +1,18 @@
+---
+- name: Change the hostname to our standard
+  ansible.windows.win_hostname:
+    name="{{ inventory_hostname }}"
+
+- name: Reboot
+  ansible.windows.win_reboot:
+
+
+- name: Update hosts file from inventory
+  community.windows.win_lineinfile:
+    path: C:\Windows\System32\drivers\etc\hosts
+    regex: '.*{{item}}$'
+    line: '{{hostvars[item].ansible_ip_addresses[1]}} {{item}}'
+    state: present
+  with_items: '{{groups.all_group}}'
+  tags:
+    - hosts

@@ -1,0 +1,2 @@
+ADMIN_PASS: changeme
+rabbitmq_erlang_cookie_file: c:\WINDOWS\system32\config\systemprofile\.erlang.cookie
