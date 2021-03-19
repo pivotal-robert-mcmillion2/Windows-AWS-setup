@@ -1,7 +1,7 @@
 
-win-rabbit-node1 ansible_host=54.85.253.59 ansible_password=nG7l-P(2IyxFdpM&OGnashHP4(CC$AmX
-win-rabbit-node2 ansible_host=54.172.154.79 ansible_password=TeeJMSmBgwEMcq(lVy3=Zql)rn9W*%(X
-win-rabbit-node3 ansible_host=34.228.12.77 ansible_password=OANK;V=UM7Gm9&FYKCU&Orj5j3qrTNhO
+win-rabbit-node1 ansible_host= ansible_password=
+win-rabbit-node2 ansible_host= ansible_password=
+win-rabbit-node3 ansible_host= ansible_password=
 
 [all_group]
 win-rabbit-node1
